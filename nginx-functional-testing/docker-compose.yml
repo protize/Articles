@@ -7,17 +7,25 @@ version: "2.3"
 
 services:
   nginx:
-    build: ./nginx
+    build:
+      context: ./nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
     expose:
       - '80'
   
-  test:
-    image: tutum/curl
-    tty: true
-
-  
-  # test-site1-upstream:
-  
-  # test-site2-upstream:
-  
-  # tests:
+  tests:
+    build:
+      context: ./tests
+    depends_on:
+      nginx:
+        condition: service_healthy
+    links:
+      - nginx:mywebsite.com
+    command: yarn test
+    expose:
+      - '80'

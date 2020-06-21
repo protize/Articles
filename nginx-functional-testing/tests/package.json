@@ -1,6 +1,10 @@
 {
   "dependencies": {},
+  "scripts": {
+    "test": "jest --verbose"
+  },
   "devDependencies": {
-    "jest": "^26.0.1"
+    "jest": "^26.0.1",
+    "supertest": "^4.0.2"
   }
 }
