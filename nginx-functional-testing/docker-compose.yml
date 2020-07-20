@@ -1,10 +1,5 @@
 version: "2.3"
 
-# networks:
-#   no-internet:
-#     driver: bridge
-#     internal: true
-
 services:
   nginx:
     build:
@@ -15,17 +10,6 @@ services:
       timeout: 30s
       retries: 3
       start_period: 10s
-    expose:
-      - '80'
-  
-  tests:
-    build:
-      context: ./tests
-    depends_on:
-      nginx:
-        condition: service_healthy
-    links:
-      - nginx:mywebsite.com
-    command: yarn test
-    expose:
-      - '80'
+    tty: true
+    ports:
+      - 80:80

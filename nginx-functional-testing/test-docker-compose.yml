@@ -1,0 +1,67 @@
+version: "2.3"
+
+networks:
+  no-internet:
+    driver: bridge
+    internal: true
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+    links:
+      - example:example.com
+      - washington:www.washington.edu
+    tty: true
+    expose:
+      - '80'
+      - '443'
+    networks:
+      - no-internet
+
+  tests:
+    build:
+      context: ./tests
+    depends_on:
+      nginx:
+        condition: service_healthy
+    links:
+      - nginx:mywebsite.com
+    command: yarn test
+    tty: true
+    expose:
+      - '80'
+      - '443'
+    networks:
+      - no-internet
+
+  example:
+    image: nginx:1.18.0-alpine
+    # build:
+    #   context: ./tests/upstream
+    #   args:
+    #     UPSTREAM_TYPE: example
+    tty: true
+    expose:
+      - '80'
+      - '443'
+    networks:
+      - no-internet
+
+  washington:
+    build:
+      context: ./tests/upstream
+      args:
+        UPSTREAM_TYPE: washington
+    tty: true
+    expose:
+      - '80'
+      - '443'
+    networks:
+      - no-internet
